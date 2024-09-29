@@ -1,22 +1,23 @@
-{ lib
-, fetchFromGitHub
-, rustPlatform
-, libcosmicAppHook
-, pkg-config
-, pulseaudio
-, udev
-, nix-update-script
+{
+  lib,
+  fetchFromGitHub,
+  rustPlatform,
+  libcosmicAppHook,
+  pkg-config,
+  pulseaudio,
+  udev,
+  nix-update-script,
 }:
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-osd";
-  version = "1.0.0-alpha.1-unstable-2024-07-15";
+  version = "1.0.0-alpha.2-unstable-2024-09-26";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-osd";
-    rev = "27fc5e5ba4bbed119a1fc85f840db0ade13dde85";
-    hash = "sha256-JDdVFNTJI9O88lLKB1esJE4sk7ZZnTMilQRZSAgnTqs=";
+    rev = "570f35fcda39f5b17051ea48158088f6a42cbfc5";
+    hash = "sha256-ybdIlQIxIt8Gix4wUPh5YKigpTOwi727Jlq2C8PfHjE=";
   };
 
   cargoLock = {
@@ -39,20 +40,32 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  nativeBuildInputs = [ libcosmicAppHook pkg-config ];
-  buildInputs = [ pulseaudio udev ];
+  nativeBuildInputs = [
+    libcosmicAppHook
+    pkg-config
+  ];
+  buildInputs = [
+    pulseaudio
+    udev
+  ];
 
   env.POLKIT_AGENT_HELPER_1 = "/run/wrappers/bin/polkit-agent-helper-1";
 
   passthru.updateScript = nix-update-script {
-    extraArgs = [ "--version-regex" "epoch-(.*)" ];
+    extraArgs = [
+      "--version-regex"
+      "epoch-(.*)"
+    ];
   };
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-osd";
     description = "OSD for the COSMIC Desktop Environment";
     license = licenses.gpl3Only;
-    maintainers = with maintainers; [ nyanbinary /*lilyinstarlight*/ ];
+    maintainers = with maintainers; [
+      # lilyinstarlight
+    ];
     platforms = platforms.linux;
+    mainProgram = "cosmic-osd";
   };
 }

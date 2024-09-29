@@ -5,18 +5,19 @@
   libcosmicAppHook,
   just,
   stdenv,
+  util-linux,
   nix-update-script,
 }:
 
 rustPlatform.buildRustPackage {
-  pname = "cosmic-applibrary";
-  version = "1.0.0-alpha.2-unstable-2024-09-24";
+  pname = "cosmic-applet-emoji-selector";
+  version = "0.1.5-unstable-2024-08-19";
 
   src = fetchFromGitHub {
-    owner = "pop-os";
-    repo = "cosmic-applibrary";
-    rev = "de55dc5861bc9a9ca49fd7bf9a16372d1dc2a3be";
-    hash = "sha256-mnvMweNCK/XkT+TlQ6C/B6A404f/mdqwDSC6y0okrYE=";
+    owner = "leb-kuchen";
+    repo = "cosmic-ext-applet-emoji-selector";
+    rev = "13c0a7e1a10202775870d4320e4b1c5e00eecd42";
+    hash = "sha256-6I9LPy7dpF0L9tb5EZzlXTRmF2RgRhEIiszlEL+DvTg=";
   };
 
   cargoLock = {
@@ -25,12 +26,11 @@ rustPlatform.buildRustPackage {
       "accesskit-0.12.2" = "sha256-1UwgRyUe0PQrZrpS7574oNLi13fg5HpgILtZGW6JNtQ=";
       "atomicwrites-0.4.2" = "sha256-QZSuGPrJXh+svMeFWqAXoqZQxLq/WfIiamqvjJNVhxA=";
       "clipboard_macos-0.1.0" = "sha256-cG5vnkiyDlQnbEfV2sPbmBYKv1hd3pjJrymfZb8ziKk=";
-      "cosmic-app-list-config-0.1.0" = "sha256-xRMW/tikw1DHuYuCgCPQf3xxrKSKFVRYI+ipK2jSaaM=";
       "cosmic-client-toolkit-0.1.0" = "sha256-1XtyEvednEMN4MApxTQid4eed19dEN5ZBDt/XRjuda0=";
-      "cosmic-config-0.1.0" = "sha256-gXrMEoAN+7nYAEcs4w6wROhQTjMCxkGn+muJutktLyk=";
-      "cosmic-panel-config-0.1.0" = "sha256-PBkYCwZlZ0UPJ3irOD2PC3zfdjZ+/EnVurGsAlAs6xo=";
-      "cosmic-settings-daemon-0.1.0" = "sha256-mcunAOrjOgt6Y8me4fjpF3fZcK4jQDIpLYlPKuarQLQ=";
-      "cosmic-text-0.12.1" = "sha256-u2Tw+XhpIKeFg8Wgru/sjGw6GUZ2m50ZDmRBJ1IM66w=";
+      "cosmic-config-0.1.0" = "sha256-zdhdsGpf+/38WLDL1goKH22FbZx/Ntz4GUedaToGgEo=";
+      "cosmic-panel-config-0.1.0" = "sha256-aw5OlsGTIkZStepTCLGsyG8NsiLssEGmDl0G/bZYLRY=";
+      "cosmic-text-0.12.1" = "sha256-x0XTxzbmtE2d4XCG/Nuq3DzBpz15BbnjRRlirfNJEiU=";
+      "cosmic-time-0.4.0" = "sha256-w4yY1fc4r1+pSv93dy/Hu3AD+I1+sozIPbbCoaVQj7w=";
       "d3d12-0.19.0" = "sha256-usrxQXWLGJDjmIdw1LBXtBvX+CchZDvE8fHC0LjvhD4=";
       "glyphon-0.5.0" = "sha256-j1HrbEpUBqazWqNfJhpyjWuxYAxkvbXzRKeSouUoPWg=";
       "smithay-clipboard-0.8.0" = "sha256-4InFXm0ahrqFrtNLeqIuE3yeOpxKZJZx+Bc0yQDtv34=";
@@ -42,6 +42,7 @@ rustPlatform.buildRustPackage {
   nativeBuildInputs = [
     libcosmicAppHook
     just
+    util-linux
   ];
 
   dontUseJustBuild = true;
@@ -51,26 +52,32 @@ rustPlatform.buildRustPackage {
     "--set"
     "prefix"
     (placeholder "out")
-    "--set"
-    "bin-src"
-    "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-app-library"
   ];
 
-  passthru.updateScript = nix-update-script {
-    extraArgs = [
-      "--version-regex"
-      "epoch-(.*)"
-    ];
-  };
+  installTargets = [
+    "install"
+    "install-schema"
+  ];
+
+  postPatch = ''
+    substituteInPlace justfile \
+      --replace-fail './target/release' './target/${stdenv.hostPlatform.rust.cargoShortTarget}/release' \
+      --replace-fail '~/.config/cosmic' "$out/share/cosmic"
+  '';
+
+  passthru.updateScript = nix-update-script { };
 
   meta = with lib; {
-    homepage = "https://github.com/pop-os/cosmic-applibrary";
-    description = "Application Template for the COSMIC Desktop Environment";
-    license = licenses.gpl3Only;
+    homepage = "https://github.com/leb-kuchen/cosmic-ext-applet-emoji-selector";
+    description = "Emoji selector applet for the COSMIC Desktop Environment";
+    license = with licenses; [
+      mpl20
+      mit
+    ];
     maintainers = with maintainers; [
       # lilyinstarlight
     ];
     platforms = platforms.linux;
-    mainProgram = "cosmic-app-library";
+    mainProgram = "cosmic-applet-emoji-selector";
   };
 }

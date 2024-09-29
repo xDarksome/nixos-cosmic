@@ -44,14 +44,17 @@
       default = import ./nixos { cosmicOverlay = self.overlays.default; };
     };
 
-    legacyPackages = forAllSystems (system: let lib = nixpkgs.lib; pkgs = nixpkgs.legacyPackages.${system}; in {
+    legacyPackages = forAllSystems (system: let
+      lib = nixpkgs.lib;
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
       update = pkgs.writeShellApplication {
         name = "cosmic-unstable-update";
 
         text = lib.concatStringsSep "\n" (lib.mapAttrsToList (attr: drv:
           if drv ? updateScript && (lib.isList drv.updateScript) && (lib.length drv.updateScript) > 0
-            then lib.escapeShellArgs (drv.updateScript ++ lib.optionals (lib.match "nix-update|.*/nix-update" (lib.head drv.updateScript) != null) [ "--version" "branch=HEAD" "--commit" attr ])
-            else builtins.toString drv.updateScript or "") self.packages.${system});
+            then lib.escapeShellArgs (if (lib.match "nix-update|.*/nix-update" (lib.head drv.updateScript) != null) then [ (lib.getExe pkgs.nix-update) ] ++ (lib.tail drv.updateScript) ++ [ "--version" "branch=HEAD" "--commit" attr ] else drv.updateScript)
+            else builtins.toString drv.updateScript or "") (self.lib.packagesFor pkgs));
       };
 
       vm = nixpkgs.lib.makeOverridable ({ nixpkgs }: let
@@ -69,7 +72,16 @@
 
               services.flatpak.enable = true;
 
-              environment.systemPackages = [ pkgs.drm_info pkgs.firefox pkgs.cosmic-emoji-picker pkgs.cosmic-tasks ];
+              environment.systemPackages = with pkgs; [
+                cosmic-applet-emoji-selector
+                cosmic-calculator
+                cosmic-player
+                cosmic-reader
+                cosmic-tasks
+                drm_info
+                firefox
+                quick-webapps
+              ];
 
               boot.kernelParams = [ "quiet" "udev.log_level=3"  ];
               boot.initrd.kernelModules = [ "bochs" ];
@@ -104,13 +116,14 @@
               virtualisation.mountHostNixStore = true;
 
               virtualisation.memorySize = 4096;
-              # TODO: below options can be removed once NixOS/nixpkgs#279009 is merged
+              # TODO: below option can be removed once NixOS/nixpkgs#279009 is merged
               virtualisation.qemu.options = [ "-vga none" "-device virtio-gpu-gl-pci" "-display default,gl=on" ];
 
               virtualisation.forwardPorts = [
                 { from = "host"; host.port = 2222; guest.port = 22; }
               ];
 
+              nixpkgs.config.allowAliases = false;
               nixpkgs.hostPlatform = system;
 
               system.stateVersion = lib.trivial.release;

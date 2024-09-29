@@ -1,14 +1,15 @@
-{ lib
-, fetchFromGitHub
-, rustPlatform
-, bash
-, fd
-, just
-, libqalculate
-, libxkbcommon
-, pkg-config
-, stdenv
-, nix-update-script
+{
+  lib,
+  fetchFromGitHub,
+  rustPlatform,
+  bash,
+  fd,
+  just,
+  libqalculate,
+  libxkbcommon,
+  pkg-config,
+  stdenv,
+  nix-update-script,
 }:
 
 rustPlatform.buildRustPackage {
@@ -31,13 +32,26 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  nativeBuildInputs = [ just pkg-config ];
-  buildInputs = [ bash libxkbcommon ];
+  nativeBuildInputs = [
+    just
+    pkg-config
+  ];
+  buildInputs = [
+    bash
+    libxkbcommon
+  ];
 
-  cargoBuildFlags = [ "--package" "pop-launcher-bin" ];
-  cargoTestFlags = [ "--package" "pop-launcher-bin" ];
+  cargoBuildFlags = [
+    "--package"
+    "pop-launcher-bin"
+  ];
+  cargoTestFlags = [
+    "--package"
+    "pop-launcher-bin"
+  ];
 
   dontUseJustBuild = true;
+  dontUseJustCheck = true;
 
   justFlags = [
     "--set"
@@ -54,9 +68,9 @@ rustPlatform.buildRustPackage {
     substituteInPlace plugins/src/scripts/mod.rs \
       --replace-fail '/usr/lib/pop-launcher' "$out/share/pop-launcher"
     substituteInPlace plugins/src/calc/mod.rs \
-      --replace-fail 'Command::new("qalc")' 'Command::new("${libqalculate}/bin/qalc")'
+      --replace-fail 'Command::new("qalc")' 'Command::new("${lib.getExe libqalculate}")'
     substituteInPlace plugins/src/find/mod.rs \
-      --replace-fail 'spawn("fd")' 'spawn("${fd}/bin/fd")'
+      --replace-fail 'spawn("fd")' 'spawn("${lib.getExe fd}")'
     substituteInPlace plugins/src/terminal/mod.rs \
       --replace-fail '/usr/bin/gnome-terminal' 'gnome-terminal'
 
@@ -73,9 +87,11 @@ rustPlatform.buildRustPackage {
   meta = with lib; {
     description = "Modular IPC-based desktop launcher service";
     homepage = "https://github.com/pop-os/launcher";
-    platforms = platforms.linux;
     license = licenses.mpl20;
-    maintainers = with maintainers; [ samhug /*lilyinstarlight*/ ];
+    maintainers = with maintainers; [
+      # lilyinstarlight
+    ];
+    platforms = platforms.linux;
     mainProgram = "pop-launcher";
   };
 }

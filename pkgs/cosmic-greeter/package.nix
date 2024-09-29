@@ -1,27 +1,28 @@
-{ lib
-, fetchFromGitHub
-, rustPlatform
-, libcosmicAppHook
-, cmake
-, coreutils
-, just
-, libinput
-, linux-pam
-, rust
-, stdenv
-, udev
-, nix-update-script
+{
+  lib,
+  fetchFromGitHub,
+  rustPlatform,
+  libcosmicAppHook,
+  cmake,
+  coreutils,
+  just,
+  libinput,
+  linux-pam,
+  stdenv,
+  udev,
+  xkeyboard_config,
+  nix-update-script,
 }:
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-greeter";
-  version = "1.0.0-alpha.1-unstable-2024-08-15";
+  version = "1.0.0-alpha.2-unstable-2024-09-27";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-greeter";
-    rev = "3679ee55614f7c37f8a2eb9b52900024c186a576";
-    sha256 = "sha256-QpHU9EOLoOL+HzbM9+FTAPZ6a51PyIJ00e337zUg7ns=";
+    rev = "8e19b3f7915398619799cb6d78183b93007dd3ef";
+    sha256 = "sha256-Ymp+TlxabGnqBV1K2Lr9vZNnzF+Lw6DR3y+Z76676Jg=";
   };
 
   cargoLock = {
@@ -44,12 +45,22 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  nativeBuildInputs = [ libcosmicAppHook rustPlatform.bindgenHook cmake just ];
-  buildInputs = [ libinput linux-pam udev ];
+  nativeBuildInputs = [
+    libcosmicAppHook
+    rustPlatform.bindgenHook
+    cmake
+    just
+  ];
+  buildInputs = [
+    libinput
+    linux-pam
+    udev
+  ];
 
   cargoBuildFlags = [ "--all" ];
 
   dontUseJustBuild = true;
+  dontUseJustCheck = true;
 
   justFlags = [
     "--set"
@@ -57,25 +68,36 @@ rustPlatform.buildRustPackage {
     (placeholder "out")
     "--set"
     "bin-src"
-    "target/${rust.lib.toRustTargetSpecShort stdenv.hostPlatform}/release/cosmic-greeter"
+    "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-greeter"
     "--set"
     "daemon-src"
-    "target/${rust.lib.toRustTargetSpecShort stdenv.hostPlatform}/release/cosmic-greeter-daemon"
+    "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-greeter-daemon"
   ];
 
   postPatch = ''
     substituteInPlace src/greeter.rs --replace-fail '/usr/bin/env' '${lib.getExe' coreutils "env"}'
   '';
 
+  postInstall = ''
+    libcosmicAppWrapperArgs+=(--set X11_BASE_RULES_XML ${xkeyboard_config}/share/X11/xkb/rules/base.xml)
+    libcosmicAppWrapperArgs+=(--set X11_EXTRA_RULES_XML ${xkeyboard_config}/share/X11/xkb/rules/base.extras.xml)
+  '';
+
   passthru.updateScript = nix-update-script {
-    extraArgs = [ "--version-regex" "epoch-(.*)" ];
+    extraArgs = [
+      "--version-regex"
+      "epoch-(.*)"
+    ];
   };
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-greeter";
     description = "Greeter for the COSMIC Desktop Environment";
     license = licenses.gpl3Only;
-    maintainers = with maintainers; [ nyanbinary /*lilyinstarlight*/ ];
+    maintainers = with maintainers; [
+      # lilyinstarlight
+    ];
     platforms = platforms.linux;
+    mainProgram = "cosmic-greeter";
   };
 }

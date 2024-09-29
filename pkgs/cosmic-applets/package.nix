@@ -1,28 +1,30 @@
-{ lib
-, fetchFromGitHub
-, rustPlatform
-, libcosmicAppHook
-, dbus
-, glib
-, just
-, libinput
-, pkg-config
-, pulseaudio
-, stdenv
-, udev
-, util-linux
-, nix-update-script
+{
+  lib,
+  fetchFromGitHub,
+  rustPlatform,
+  libcosmicAppHook,
+  dbus,
+  glib,
+  just,
+  libinput,
+  pkg-config,
+  pulseaudio,
+  stdenv,
+  udev,
+  util-linux,
+  xkeyboard_config,
+  nix-update-script,
 }:
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-applets";
-  version = "1.0.0-alpha.1-unstable-2024-08-15";
+  version = "1.0.0-alpha.2-unstable-2024-09-24";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-applets";
-    rev = "845948f5c812615f31e7c2d789602997d65097cd";
-    hash = "sha256-wztQKq+DC5jwa1zdzEtsvbEZ5vW0Id+kgOO4pnE9cns=";
+    rev = "3670f124fb51ff730c470398014a38ee166e2dbb";
+    hash = "sha256-dEVP0M+rKUjod7swoca3EtQqPaPy3dvAc2TdLeltHJU=";
   };
 
   cargoLock = {
@@ -33,13 +35,13 @@ rustPlatform.buildRustPackage {
       "clipboard_macos-0.1.0" = "sha256-cG5vnkiyDlQnbEfV2sPbmBYKv1hd3pjJrymfZb8ziKk=";
       "cosmic-client-toolkit-0.1.0" = "sha256-1XtyEvednEMN4MApxTQid4eed19dEN5ZBDt/XRjuda0=";
       "cosmic-comp-config-0.1.0" = "sha256-uUpRd8bR2TyD7Y1lpKmJTaTNv9yNsZVnr0oWDQgHD/0=";
-      "cosmic-config-0.1.0" = "sha256-vkYq91Zvz8RNdXm5z26Rc3XaHtD2/PuUYfYJkORKdgE=";
-      "cosmic-dbus-networkmanager-0.1.0" = "sha256-+1XB7r45Uc71fLnNR4U0DUF2EB8uzKeE4HIrdvKhFXo=";
-      "cosmic-notifications-config-0.1.0" = "sha256-VdJ6W8+g2492wAr1kDLo2zWZGc01gHp2dvLVtj/xArE=";
-      "cosmic-panel-config-0.1.0" = "sha256-Hi4WVWODxtKIzhvq16LVrjvEaLN/FOgA3ycLItx70dY=";
-      "cosmic-settings-subscriptions-0.1.0" = "sha256-A2ZVaTeQ5rwNI3r48cVtC5s7fhnK84rD+p+gaB42MaQ=";
-      "cosmic-text-0.12.1" = "sha256-x0XTxzbmtE2d4XCG/Nuq3DzBpz15BbnjRRlirfNJEiU=";
-      "cosmic-time-0.4.0" = "sha256-w4yY1fc4r1+pSv93dy/Hu3AD+I1+sozIPbbCoaVQj7w=";
+      "cosmic-config-0.1.0" = "sha256-gXrMEoAN+7nYAEcs4w6wROhQTjMCxkGn+muJutktLyk=";
+      "cosmic-dbus-networkmanager-0.1.0" = "sha256-mcunAOrjOgt6Y8me4fjpF3fZcK4jQDIpLYlPKuarQLQ=";
+      "cosmic-notifications-config-0.1.0" = "sha256-tCizZePze94tbJbR91N9rfUhrLFTAMW2oL9ByKOeDAU=";
+      "cosmic-panel-config-0.1.0" = "sha256-PBkYCwZlZ0UPJ3irOD2PC3zfdjZ+/EnVurGsAlAs6xo=";
+      "cosmic-settings-subscriptions-0.1.0" = "sha256-Mmyx3q18BP3j5sUeyyNytmBEBzdJWTmy6AgAGCFe90c=";
+      "cosmic-text-0.12.1" = "sha256-u2Tw+XhpIKeFg8Wgru/sjGw6GUZ2m50ZDmRBJ1IM66w=";
+      "cosmic-time-0.4.0" = "sha256-Q11IcKzuMBc3CIlpZeCMML6OagaKwmGqQ0IMoDso+Ig=";
       "d3d12-0.19.0" = "sha256-usrxQXWLGJDjmIdw1LBXtBvX+CchZDvE8fHC0LjvhD4=";
       "glyphon-0.5.0" = "sha256-j1HrbEpUBqazWqNfJhpyjWuxYAxkvbXzRKeSouUoPWg=";
       "smithay-clipboard-0.8.0" = "sha256-4InFXm0ahrqFrtNLeqIuE3yeOpxKZJZx+Bc0yQDtv34=";
@@ -48,25 +50,51 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  nativeBuildInputs = [ libcosmicAppHook just pkg-config util-linux ];
-  buildInputs = [ dbus glib libinput pulseaudio udev ];
-
-  dontUseJustBuild = true;
-
-  justFlags = [
-    "--set" "prefix" (placeholder "out")
-    "--set" "target" "${stdenv.hostPlatform.rust.cargoShortTarget}/release"
+  nativeBuildInputs = [
+    libcosmicAppHook
+    just
+    pkg-config
+    util-linux
+  ];
+  buildInputs = [
+    dbus
+    glib
+    libinput
+    pulseaudio
+    udev
   ];
 
+  dontUseJustBuild = true;
+  dontUseJustCheck = true;
+
+  justFlags = [
+    "--set"
+    "prefix"
+    (placeholder "out")
+    "--set"
+    "target"
+    "${stdenv.hostPlatform.rust.cargoShortTarget}/release"
+  ];
+
+  postInstall = ''
+    libcosmicAppWrapperArgs+=(--set X11_BASE_RULES_XML ${xkeyboard_config}/share/X11/xkb/rules/base.xml)
+    libcosmicAppWrapperArgs+=(--set X11_EXTRA_RULES_XML ${xkeyboard_config}/share/X11/xkb/rules/base.extras.xml)
+  '';
+
   passthru.updateScript = nix-update-script {
-    extraArgs = [ "--version-regex" "epoch-(.*)" ];
+    extraArgs = [
+      "--version-regex"
+      "epoch-(.*)"
+    ];
   };
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-applets";
     description = "Applets for the COSMIC Desktop Environment";
     license = licenses.gpl3Only;
-    maintainers = with maintainers; [ qyliss nyanbinary /*lilyinstarlight*/ ];
+    maintainers = with maintainers; [
+      # lilyinstarlight
+    ];
     platforms = platforms.linux;
   };
 }

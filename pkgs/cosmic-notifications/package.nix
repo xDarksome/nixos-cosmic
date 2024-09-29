@@ -1,16 +1,17 @@
-{ lib
-, fetchFromGitHub
-, rustPlatform
-, libcosmicAppHook
-, just
-, stdenv
-, which
-, nix-update-script
+{
+  lib,
+  fetchFromGitHub,
+  rustPlatform,
+  libcosmicAppHook,
+  just,
+  stdenv,
+  which,
+  nix-update-script,
 }:
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-notifications";
-  version = "1.0.0-alpha.1-unstable-2024-08-01";
+  version = "1.0.0-alpha.2-unstable-2024-08-01";
 
   src = fetchFromGitHub {
     owner = "pop-os";
@@ -39,9 +40,14 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  nativeBuildInputs = [ libcosmicAppHook just which ];
+  nativeBuildInputs = [
+    libcosmicAppHook
+    just
+    which
+  ];
 
   dontUseJustBuild = true;
+  dontUseJustCheck = true;
 
   justFlags = [
     "--set"
@@ -53,14 +59,20 @@ rustPlatform.buildRustPackage {
   ];
 
   passthru.updateScript = nix-update-script {
-    extraArgs = [ "--version-regex" "epoch-(.*)" ];
+    extraArgs = [
+      "--version-regex"
+      "epoch-(.*)"
+    ];
   };
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-notifications";
     description = "Notifications for the COSMIC Desktop Environment";
     license = licenses.gpl3Only;
-    maintainers = with maintainers; [ nyanbinary /*lilyinstarlight*/ ];
+    maintainers = with maintainers; [
+      # lilyinstarlight
+    ];
     platforms = platforms.linux;
+    mainProgram = "cosmic-notifications";
   };
 }

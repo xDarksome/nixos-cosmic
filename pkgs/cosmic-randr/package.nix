@@ -1,16 +1,17 @@
-{ lib
-, fetchFromGitHub
-, rustPlatform
-, stdenv
-, just
-, pkg-config
-, wayland
-, nix-update-script
+{
+  lib,
+  fetchFromGitHub,
+  rustPlatform,
+  stdenv,
+  just,
+  pkg-config,
+  wayland,
+  nix-update-script,
 }:
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-randr";
-  version = "1.0.0-alpha.1-unstable-2024-07-31";
+  version = "1.0.0-alpha.2-unstable-2024-07-31";
 
   src = fetchFromGitHub {
     owner = "pop-os";
@@ -26,10 +27,14 @@ rustPlatform.buildRustPackage {
     };
   };
 
-  nativeBuildInputs = [ just pkg-config ];
+  nativeBuildInputs = [
+    just
+    pkg-config
+  ];
   buildInputs = [ wayland ];
 
   dontUseJustBuild = true;
+  dontUseJustCheck = true;
 
   justFlags = [
     "--set"
@@ -41,14 +46,19 @@ rustPlatform.buildRustPackage {
   ];
 
   passthru.updateScript = nix-update-script {
-    extraArgs = [ "--version-regex" "epoch-(.*)" ];
+    extraArgs = [
+      "--version-regex"
+      "epoch-(.*)"
+    ];
   };
 
   meta = with lib; {
     homepage = "https://github.com/pop-os/cosmic-randr";
     description = "Library and utility for displaying and configuring Wayland outputs";
     license = licenses.mpl20;
-    maintainers = with maintainers; [ nyanbinary /*lilyinstarlight*/ ];
+    maintainers = with maintainers; [
+      # lilyinstarlight
+    ];
     platforms = platforms.linux;
     mainProgram = "cosmic-randr";
   };
