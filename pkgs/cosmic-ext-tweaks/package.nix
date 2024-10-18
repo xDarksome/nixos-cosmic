@@ -1,27 +1,24 @@
 {
   lib,
   fetchFromGitHub,
-  rustPlatform,
   libcosmicAppHook,
-  alsa-lib,
-  ffmpeg,
-  glib,
-  gst_all_1,
+  rustPlatform,
   just,
+  openssl,
   pkg-config,
   stdenv,
   nix-update-script,
 }:
 
-rustPlatform.buildRustPackage {
-  pname = "cosmic-player";
-  version = "0-unstable-2024-10-14";
+rustPlatform.buildRustPackage rec {
+  pname = "cosmic-ext-tweaks";
+  version = "0-unstable-2024-10-13";
 
   src = fetchFromGitHub {
-    owner = "pop-os";
-    repo = "cosmic-player";
-    rev = "d8ee67cc7f9adc7f6b6125033c416bade69a8412";
-    hash = "sha256-cTxg2jazgHme3hxfdY1/E2d+MLAjLxitGTL4ycQ4j+Q=";
+    owner = "cosmic-utils";
+    repo = "tweaks";
+    rev = "09c99ff048163bf7aead6f1a600d40f91378320e";
+    hash = "sha256-0jXRsq/3P2ivnGwcI3rkQAqwM3J/ekT3SceOqRks+Q4=";
   };
 
   cargoLock = {
@@ -30,33 +27,28 @@ rustPlatform.buildRustPackage {
       "accesskit-0.12.2" = "sha256-1UwgRyUe0PQrZrpS7574oNLi13fg5HpgILtZGW6JNtQ=";
       "atomicwrites-0.4.2" = "sha256-QZSuGPrJXh+svMeFWqAXoqZQxLq/WfIiamqvjJNVhxA=";
       "clipboard_macos-0.1.0" = "sha256-cG5vnkiyDlQnbEfV2sPbmBYKv1hd3pjJrymfZb8ziKk=";
-      "cosmic-config-0.1.0" = "sha256-XXT92zsdwkzx9dajSYlK6p/XPp6ajq9xJT504T1L4qU=";
+      "cosmic-config-0.1.0" = "sha256-6jl9AnuPlbObQl4JayWFAvcrfADJgcWKnY1fVASZods=";
+      "cosmic-panel-config-0.1.0" = "sha256-s+p5pCzacNOJLCEmMH+QdwQlK1aGUBqIetlXW7D3A0A=";
       "cosmic-text-0.12.1" = "sha256-u2Tw+XhpIKeFg8Wgru/sjGw6GUZ2m50ZDmRBJ1IM66w=";
       "d3d12-0.19.0" = "sha256-usrxQXWLGJDjmIdw1LBXtBvX+CchZDvE8fHC0LjvhD4=";
       "glyphon-0.5.0" = "sha256-j1HrbEpUBqazWqNfJhpyjWuxYAxkvbXzRKeSouUoPWg=";
-      "iced_video_player-0.6.0" = "sha256-6k7UbcmzalUDfSgpnkL39SqskD08VHIj4RwIfHV/zAI=";
+      "smithay-client-toolkit-0.18.0" = "sha256-/7twYMt5/LpzxLXAQKTGNnWcfspUkkZsN5hJu7KaANc=";
       "smithay-clipboard-0.8.0" = "sha256-4InFXm0ahrqFrtNLeqIuE3yeOpxKZJZx+Bc0yQDtv34=";
       "softbuffer-0.4.1" = "sha256-a0bUFz6O8CWRweNt/OxTvflnPYwO5nm6vsyc/WcXyNg=";
       "taffy-0.3.11" = "sha256-SCx9GEIJjWdoNVyq+RZAGn0N71qraKZxf9ZWhvyzLaI=";
       "winit-0.29.10" = "sha256-ScTII2AzK3SC8MVeASZ9jhVWsEaGrSQ2BnApTxgfxK4=";
+      "xdg-shell-wrapper-config-0.1.0" = "sha256-OjFcBzVE/fpHTK9bHxcHocEa16q6i9mVRNfJ9lLa/cw=";
     };
   };
 
   nativeBuildInputs = [
     libcosmicAppHook
-    rustPlatform.bindgenHook
     just
     pkg-config
   ];
 
   buildInputs = [
-    alsa-lib
-    ffmpeg
-    glib
-    gst_all_1.gstreamer
-    gst_all_1.gst-plugins-base
-    gst_all_1.gst-plugins-good
-    gst_all_1.gst-plugins-bad
+    openssl
   ];
 
   dontUseJustBuild = true;
@@ -68,26 +60,21 @@ rustPlatform.buildRustPackage {
     (placeholder "out")
     "--set"
     "bin-src"
-    "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-player"
+    "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-ext-tweaks"
   ];
 
-  postInstall = ''
-    libcosmicAppWrapperArgs+=(--prefix GST_PLUGIN_SYSTEM_PATH_1_0 : "$GST_PLUGIN_SYSTEM_PATH_1_0")
-  '';
+  env.VERGEN_GIT_SHA = src.rev;
 
-  passthru.updateScript = nix-update-script {
-    # TODO: uncomment when there are actual tagged releases
-    #extraArgs = [ "--version-regex" "epoch-(.*)" ];
-  };
+  passthru.updateScript = nix-update-script { };
 
   meta = with lib; {
-    homepage = "https://github.com/pop-os/cosmic-player";
-    description = "Media player for the COSMIC Desktop Environment";
+    homepage = "https://github.com/cosmic-utils/tweaks";
+    description = "Tweaking tool for the COSMIC Desktop Environment";
     license = licenses.gpl3Only;
     maintainers = with maintainers; [
       # lilyinstarlight
     ];
     platforms = platforms.linux;
-    mainProgram = "cosmic-player";
+    mainProgram = "cosmic-ext-tweaks";
   };
 }

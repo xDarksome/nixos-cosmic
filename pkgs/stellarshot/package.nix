@@ -1,23 +1,22 @@
 {
   lib,
   fetchFromGitHub,
-  rustPlatform,
   libcosmicAppHook,
+  rustPlatform,
   just,
   stdenv,
-  util-linux,
   nix-update-script,
 }:
 
-rustPlatform.buildRustPackage {
-  pname = "cosmic-panel";
-  version = "1.0.0-alpha.2-unstable-2024-09-27";
+rustPlatform.buildRustPackage rec {
+  pname = "stellarshot";
+  version = "0-unstable-2024-10-04";
 
   src = fetchFromGitHub {
-    owner = "pop-os";
-    repo = "cosmic-panel";
-    rev = "0ce85da198f02f94ad75441e64c0e165c41eb4ae";
-    hash = "sha256-1gOvJeA+K2F37RJH75dsMxpoRSF6ayjtw3UvKVl2gB4=";
+    owner = "cosmic-utils";
+    repo = "stellarshot";
+    rev = "7ecbeeb1e73aff7dd32149b82549d8911a060574";
+    hash = "sha256-9tt4o3vUSqaI4ocT6wUf8MzQoZFcau+DXG/PnM5QPNI=";
   };
 
   cargoLock = {
@@ -26,24 +25,20 @@ rustPlatform.buildRustPackage {
       "accesskit-0.12.2" = "sha256-1UwgRyUe0PQrZrpS7574oNLi13fg5HpgILtZGW6JNtQ=";
       "atomicwrites-0.4.2" = "sha256-QZSuGPrJXh+svMeFWqAXoqZQxLq/WfIiamqvjJNVhxA=";
       "clipboard_macos-0.1.0" = "sha256-cG5vnkiyDlQnbEfV2sPbmBYKv1hd3pjJrymfZb8ziKk=";
-      "cosmic-client-toolkit-0.1.0" = "sha256-1XtyEvednEMN4MApxTQid4eed19dEN5ZBDt/XRjuda0=";
-      "cosmic-config-0.1.0" = "sha256-zdhdsGpf+/38WLDL1goKH22FbZx/Ntz4GUedaToGgEo=";
-      "cosmic-notifications-util-0.1.0" = "sha256-tCizZePze94tbJbR91N9rfUhrLFTAMW2oL9ByKOeDAU=";
-      "cosmic-text-0.12.1" = "sha256-x0XTxzbmtE2d4XCG/Nuq3DzBpz15BbnjRRlirfNJEiU=";
+      "cosmic-config-0.1.0" = "sha256-zamYPvxmIqh4IT4G+aqceP1mXNNBA1TAcJwAtjlbYAU=";
+      "cosmic-text-0.12.1" = "sha256-5Gk220HTiHuxDvyqwz1Dwr+BaLvH/6X7M14IirQzcsE=";
       "d3d12-0.19.0" = "sha256-usrxQXWLGJDjmIdw1LBXtBvX+CchZDvE8fHC0LjvhD4=";
       "glyphon-0.5.0" = "sha256-j1HrbEpUBqazWqNfJhpyjWuxYAxkvbXzRKeSouUoPWg=";
-      "launch-pad-0.1.0" = "sha256-yWd+QGI0z53p1WfFuGryhrcd5q82MxwHCNJuNyrldzQ=";
-      "smithay-0.3.0" = "sha256-Ir12itaCX1zDb6QzuBh9ve09KGLxxiiiW/sP4bxlx8w=";
       "smithay-clipboard-0.8.0" = "sha256-4InFXm0ahrqFrtNLeqIuE3yeOpxKZJZx+Bc0yQDtv34=";
       "softbuffer-0.4.1" = "sha256-a0bUFz6O8CWRweNt/OxTvflnPYwO5nm6vsyc/WcXyNg=";
       "taffy-0.3.11" = "sha256-SCx9GEIJjWdoNVyq+RZAGn0N71qraKZxf9ZWhvyzLaI=";
+      "winit-0.29.10" = "sha256-ScTII2AzK3SC8MVeASZ9jhVWsEaGrSQ2BnApTxgfxK4=";
     };
   };
 
   nativeBuildInputs = [
     libcosmicAppHook
     just
-    util-linux
   ];
 
   dontUseJustBuild = true;
@@ -55,24 +50,24 @@ rustPlatform.buildRustPackage {
     (placeholder "out")
     "--set"
     "bin-src"
-    "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-panel"
+    "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/stellarshot"
   ];
 
-  passthru.updateScript = nix-update-script {
-    extraArgs = [
-      "--version-regex"
-      "epoch-(.*)"
-    ];
-  };
+  # TODO: upstream depends on inter-test side effects and therefore depends on test ordering and lack of concurrency, but tests also do not seem useful
+  doCheck = false;
+
+  env.VERGEN_GIT_SHA = src.rev;
+
+  passthru.updateScript = nix-update-script { };
 
   meta = with lib; {
-    homepage = "https://github.com/pop-os/cosmic-panel";
-    description = "Panel for the COSMIC Desktop Environment";
+    homepage = "https://github.com/cosmic-utils/stellarshot";
+    description = "Simple backup application using Rustic for the COSMIC Desktop Environment";
     license = licenses.gpl3Only;
     maintainers = with maintainers; [
       # lilyinstarlight
     ];
     platforms = platforms.linux;
-    mainProgram = "cosmic-panel";
+    mainProgram = "stellarshot";
   };
 }
