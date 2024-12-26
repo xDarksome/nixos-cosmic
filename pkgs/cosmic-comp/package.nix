@@ -24,8 +24,8 @@ rustPlatform.buildRustPackage {
   src = fetchFromGitHub {
     owner = "xDarksome";
     repo = "cosmic-comp";
-    rev = "1f16013e214d007d37e71deedaf623d7dfc51ecc";
-    hash = "sha256-qNl1OA1hesDF0Chr9rvIjzfm78ZMJzW3e+B4L4HNFiI=";
+    rev = "9e88ec5fee7e00cf3d8a13d707a5fbe4bd9a983f";
+    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
   };
 
   cargoLock = {
