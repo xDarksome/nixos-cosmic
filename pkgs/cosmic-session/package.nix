@@ -12,22 +12,17 @@
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-session";
-  version = "1.0.0-alpha.2-unstable-2024-10-30";
+  version = "1.0.0-alpha.4-unstable-2024-12-17";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-session";
-    rev = "342369eaf92dbb5a3d642d82da8429ce2f57e573";
-    hash = "sha256-NI5CTWod11TTAvHMRjbDEYZ50irYFPRKs5u0fso6bu8=";
+    rev = "0a3b9f5376a089b0aeb6432a663b0adc17c48746";
+    hash = "sha256-M6OIh8llhyWHB9S5inU06ORvnhj3hPUoPCuUqLwNEBU=";
   };
 
-  cargoLock = {
-    lockFile = ./Cargo.lock;
-    outputHashes = {
-      "cosmic-notifications-util-0.1.0" = "sha256-GmTT7SFBqReBMe4GcNSym1YhsKtFQ/0hrDcwUqXkaBw=";
-      "launch-pad-0.1.0" = "sha256-c+uawTQlg5SW8x7DOBG2Idv/AfIaCFNtLQLUz8ifT2I=";
-    };
-  };
+  useFetchCargoVendor = true;
+  cargoHash = "sha256-iYObxjWJUKgZKGTkqtYgQK4758k0EYZGhIAM/oLxxso=";
 
   postPatch = ''
     substituteInPlace Justfile \
@@ -50,9 +45,17 @@ rustPlatform.buildRustPackage {
     "--set"
     "prefix"
     (placeholder "out")
+    "--set"
+    "cosmic_dconf_profile"
+    "cosmic"
   ];
 
   env.XDP_COSMIC = lib.getExe xdg-desktop-portal-cosmic;
+
+  postInstall = ''
+    mkdir -p $out/etc
+    cp -r data/dconf $out/etc/
+  '';
 
   passthru = {
     updateScript = nix-update-script {

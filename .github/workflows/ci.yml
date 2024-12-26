@@ -2,6 +2,7 @@ name: CI
 
 on:
   pull_request:
+  merge_group:
   push:
     branches:
       - main
@@ -11,22 +12,38 @@ jobs:
   build:
     strategy:
       matrix:
+#        architecture:
+#          - system: x86_64-linux
+#            runner: [linux, x64, ktisis, ktisis-c3d-highmem-8, ktisis-30GB]
+#          - system: aarch64-linux
+#            runner: [linux, ARM64, ktisis, ktisis-c4a-highmem-8, ktisis-30GB]
+#        attribute:
+#          - vm.closure
+#          - vm-stable.closure
         architecture:
           - system: x86_64-linux
-            runner: [linux, X64, drakon64/github-actions-runner-aws, EC2-m7a.2xlarge, EBS-30GB, EBS-32GB-Swap]
+            runner: [linux, x64, ktisis, ktisis-c3d-highmem-8, ktisis-30GB]
+            attribute: vm.closure
+          - system: x86_64-linux
+            runner: [ linux, x64, ktisis, ktisis-n4-highmem-8, ktisis-30GB ]
+            attribute: vm-stable.closure
           - system: aarch64-linux
-            runner: [linux, ARM64, drakon64/github-actions-runner-aws, EC2-m8g.2xlarge, EBS-30GB, EBS-32GB-Swap]
-        attribute:
-          - vm.closure
-          - vm-stable.closure
+            runner: [linux, ARM64, ktisis, ktisis-c4a-highmem-4, ktisis-30GB]
+            attribute: vm.closure
+          - system: aarch64-linux
+            runner: [ linux, ARM64, ktisis, ktisis-c4a-highmem-4, ktisis-30GB ]
+            attribute: vm-stable.closure
 
-    name: Build - ${{ matrix.architecture.system }} - ${{ matrix.attribute }}
+    name: Build - ${{ matrix.architecture.system }} - ${{ matrix.architecture.attribute }}
     runs-on: ${{ matrix.architecture.runner }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: DeterminateSystems/nix-installer-action@v14
+      - uses: DeterminateSystems/nix-installer-action@v16
+        with:
+          diagnostic-endpoint: ''
+          source-url: 'https://install.lix.systems/lix/lix-installer-${{ matrix.architecture.system }}'
 
       - uses: cachix/cachix-action@v15
         with:
@@ -35,6 +52,14 @@ jobs:
 
       - env:
           SYSTEM: ${{ matrix.architecture.system }}
-          ATTRIBUTE: ${{ matrix.attribute }}
+          ATTRIBUTE: ${{ matrix.architecture.attribute }}
         run: |
-          nix -vL build --show-trace --cores 8 --max-jobs 1 --system "$SYSTEM" ".#$ATTRIBUTE"
+          nix -L build --show-trace --cores 0 --max-jobs 1 --system "$SYSTEM" ".#$ATTRIBUTE"
+
+      - name: Pin store path in Cachix
+        env:
+          SYSTEM: ${{ matrix.architecture.system }}
+          ATTRIBUTE: ${{ matrix.architecture.attribute }}
+        run: |
+          cachix pin cosmic "$ATTRIBUTE.$SYSTEM" "$(nix eval --raw --system "$SYSTEM" ".#$ATTRIBUTE")" --keep-revisions 1
+        if: ${{ github.ref == 'refs/heads/main' }}

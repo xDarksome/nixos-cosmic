@@ -19,7 +19,7 @@
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-comp";
-  version = "1.0.0-alpha.2-unstable-2024-10-25";
+  version = "1.0.0-alpha.4-unstable-2024-12-18";
 
   src = fetchFromGitHub {
     owner = "xDarksome";
