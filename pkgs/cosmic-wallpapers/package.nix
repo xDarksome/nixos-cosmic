@@ -10,7 +10,7 @@ stdenvNoCC.mkDerivation {
   version = "1.0.0-alpha.6-unstable-2025-04-08";
 
   src = fetchFromGitHub {
-    owner = "pop-os";
+    owner = "xDarksome";
     repo = "cosmic-wallpapers";
     rev = "189c2c63d31da84ebb161acfd21a503f98a1b4c7";
     hash = "sha256-XtNmV6fxKFlirXQvxxgAYSQveQs8RCTfcFd8SVdEXtE=";
