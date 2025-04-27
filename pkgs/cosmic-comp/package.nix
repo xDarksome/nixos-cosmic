@@ -27,7 +27,7 @@ rustPlatform.buildRustPackage {
     owner = "pop-os";
     repo = "cosmic-comp";
     rev = "96e9bf3b81718e2a9ac28b2c24bd1149400b286a";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    hash = "sha256-2AnGEUWumE1C4Mi5inN7enbxCdWCKbQdYpUvTK3jGQ4=";
   };
 
   useFetchCargoVendor = true;
