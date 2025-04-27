@@ -10,19 +10,19 @@
   nix-update-script,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "cosmic-ext-tweaks";
-  version = "0.1.3-unstable-2024-12-10";
+  version = "0.1.3-unstable-2025-03-19";
 
   src = fetchFromGitHub {
     owner = "cosmic-utils";
     repo = "tweaks";
-    rev = "8daac2c6fcc1baf12bf6c8cee587bbcdcd0fc56a";
-    hash = "sha256-TnlUOQyzGpdKY1T3/BCQkjG0/g36EaDeR7cfSVsC8vY=";
+    rev = "f60ac30e30c7fd1917e9398be31514165dc7830f";
+    hash = "sha256-nhKLEBpInE6kXoGzSej3LW4IEB+QUj7BlpuIbcbVkHw=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-NaFVtmr52Bo+JUKWZY0s4C5EkkTTRn84lcQ+fQzFowQ=";
+  cargoHash = "sha256-Rn2+t5SFXK8FmM0Uy5+N8uUNiSUKzpufE2loDCvIezs=";
 
   nativeBuildInputs = [
     libcosmicAppHook
@@ -46,18 +46,16 @@ rustPlatform.buildRustPackage rec {
     "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-ext-tweaks"
   ];
 
-  env.VERGEN_GIT_SHA = src.rev;
-
   passthru.updateScript = nix-update-script { };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/cosmic-utils/tweaks";
     description = "Tweaking tool for the COSMIC Desktop Environment";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "cosmic-ext-tweaks";
   };
 }

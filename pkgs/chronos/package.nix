@@ -10,17 +10,17 @@
 
 rustPlatform.buildRustPackage {
   pname = "chronos";
-  version = "0.1.4-unstable-2024-11-11";
+  version = "0.1.5-unstable-2025-03-24";
 
   src = fetchFromGitHub {
     owner = "cosmic-utils";
     repo = "chronos";
-    rev = "b0c7cf581644cacfb50483164f5f66f8f8e21aa4";
-    hash = "sha256-lmtILgKlGSwHBVLRJ35DOCZVfGb+7uXNGYlNJxEqCBs=";
+    rev = "93a8f9a202dac704061ceeee4b7c40b24e2641fd";
+    hash = "sha256-L0HBACOnXRxb2nHqJ4IaZXJRijkWkbbyPAKwxwrM9hE=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-+9ItvsJVHezh4db9AJSSwtkT+gdBuy49BE8KIe0cfkI=";
+  cargoHash = "sha256-7zCs/OHFQuXlgGbWfcx35NhP0nPxWt2AuHQYXI27eec=";
 
   nativeBuildInputs = [
     libcosmicAppHook
@@ -41,14 +41,14 @@ rustPlatform.buildRustPackage {
 
   passthru.updateScript = nix-update-script { };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/cosmic-utils/chronos";
     description = "Simple Pomodoro timer built using libcosmic";
-    license = licenses.mit;
-    maintainers = with maintainers; [
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "chronos";
   };
 }

@@ -14,17 +14,17 @@
 
 rustPlatform.buildRustPackage {
   pname = "pop-launcher";
-  version = "1.2.4-unstable-2024-12-09";
+  version = "1.2.4-unstable-2025-03-24";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "launcher";
-    rev = "c37c2a3c6a0b0167267140f2792c49ccc0c15767";
-    hash = "sha256-p9jFLKvxg95S/H4nC71fbs9iD438dXIjFHCUfN3ftqM=";
+    rev = "58a8f2db649098463b183c09cfa5897db217e2cf";
+    hash = "sha256-v8py/IgbUuV52v9WsAYTszupwho32O8NohipviOiQoY=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-2gPWVchzFW1rIc/1/EJ3grS3Dku0GDEE3hj8L91NSvA=";
+  cargoHash = "sha256-MLh6gI8Kfio655Df+o58/8aAJNxoT51feHvkjtPgPrU=";
 
   nativeBuildInputs = [
     just
@@ -78,14 +78,14 @@ rustPlatform.buildRustPackage {
 
   passthru.updateScript = nix-update-script { };
 
-  meta = with lib; {
+  meta = {
     description = "Modular IPC-based desktop launcher service";
     homepage = "https://github.com/pop-os/launcher";
-    license = licenses.mpl20;
-    maintainers = with maintainers; [
+    license = lib.licenses.mpl20;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "pop-launcher";
   };
 }

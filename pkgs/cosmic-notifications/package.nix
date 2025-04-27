@@ -11,17 +11,17 @@
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-notifications";
-  version = "1.0.0-alpha.4-unstable-2024-12-10";
+  version = "1.0.0-alpha.6-unstable-2025-04-08";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-notifications";
-    rev = "76c237b0509ea6f724076db2195a7fab6942f33c";
-    hash = "sha256-9/uApnu8KyC+7DNu5L6J006K6CtNjRHFS7gOJATGwQU=";
+    rev = "3dc15a497b1098988c8054d7b108b784ca4b60be";
+    hash = "sha256-X+/F+BHI1Dhj+APC1k5aXczyBt0P2khVt3e/Fe7Pm/0=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-h5OPeK8WpFuBRXcnQDrgT9zO7f5pPynIJNVoMCqpNwc=";
+  cargoHash = "sha256-7EDe1OjGS6Xl0N/BrZG8lzWO0pFbwiEp+kn6WyydJQM=";
 
   nativeBuildInputs = [
     libcosmicAppHook
@@ -48,14 +48,14 @@ rustPlatform.buildRustPackage {
     ];
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/pop-os/cosmic-notifications";
     description = "Notifications for the COSMIC Desktop Environment";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "cosmic-notifications";
   };
 }

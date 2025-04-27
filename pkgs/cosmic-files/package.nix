@@ -11,17 +11,17 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "cosmic-files";
-  version = "1.0.0-alpha.4-unstable-2024-12-18";
+  version = "1.0.0-alpha.6-unstable-2025-04-08";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-files";
-    rev = "ee7954e8d6f5cca93f0151aa920c95071ec1cae0";
-    hash = "sha256-O97R0yuI9cq5/sXFTPVJH+e6vTUCs4ptqDTuXDYUxoY=";
+    rev = "7a657c646b05715ea1c36cd74025173652789389";
+    hash = "sha256-Jp8u43hJWsGXLd82jdD9BWlVA3fGBQ4kCoIbKQNHL0o=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-ZuKb654nfSt+v50l07z8uVAVP52IxCZG4Z2qDfyM6pk=";
+  cargoHash = "sha256-xelN1sBGOwt6QmPHekH7IeTw2GEoz1Gana4KCPTO0lI=";
 
   nativeBuildInputs = [
     libcosmicAppHook
@@ -29,9 +29,20 @@ rustPlatform.buildRustPackage rec {
   ];
   buildInputs = [ glib ];
 
-  # TODO: uncomment if these packages ever stop requiring mutually exclusive features
-  #cargoBuildFlags = [ "--package" "cosmic-files" "--package" "cosmic-files-applet" ];
-  #cargoTestFlags = [ "--package" "cosmic-files" "--package" "cosmic-files-applet" ];
+  # TODO: uncomment and remove phases below if these packages can ever be built at the same time
+  # NOTE: this causes issues with the desktop instance linking to a window tab when cosmic-files is opened, see <https://github.com/lilyinstarlight/nixos-cosmic/issues/591>
+  #cargoBuildFlags = [
+  #  "--package"
+  #  "cosmic-files"
+  #  "--package"
+  #  "cosmic-files-applet"
+  #];
+  # cargoTestFlags = [
+  #  "--package"
+  #  "cosmic-files"
+  #  "--package"
+  #  "cosmic-files-applet"
+  # ];
 
   dontUseJustBuild = true;
   dontUseJustCheck = true;
@@ -50,7 +61,7 @@ rustPlatform.buildRustPackage rec {
 
   env.VERGEN_GIT_SHA = src.rev;
 
-  # TODO: remove next two phases if these packages ever stop requiring mutually exclusive features
+  # TODO: remove next two phases if these packages can ever be built at the same time
   buildPhase = ''
     baseCargoBuildFlags="$cargoBuildFlags"
     cargoBuildFlags="$baseCargoBuildFlags --package cosmic-files"
@@ -74,14 +85,14 @@ rustPlatform.buildRustPackage rec {
     ];
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/pop-os/cosmic-files";
     description = "File Manager for the COSMIC Desktop Environment";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "cosmic-files";
   };
 }

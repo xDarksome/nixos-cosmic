@@ -49,16 +49,14 @@ rustPlatform.buildRustPackage {
 
   passthru.updateScript = nix-update-script { };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/maciekk64/cosmic-ext-applet-external-monitor-brightness";
-    description = "Change brightness of external monitors via DDC/CI protocol. You can also quickly toggle COSMIC system dark mode.";
-    license = with licenses; [
-      gpl3Only
-    ];
-    maintainers = with maintainers; [
+    description = "Change brightness of external monitors via DDC/CI protocol and also quickly toggle COSMIC system dark mode";
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "cosmic-ext-applet-external-monitor-brightness";
   };
 }

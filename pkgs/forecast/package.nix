@@ -10,19 +10,19 @@
   nix-update-script,
 }:
 
-rustPlatform.buildRustPackage rec {
-  pname = "cosmic-ext-forecast";
-  version = "0-unstable-2024-11-26";
+rustPlatform.buildRustPackage {
+  pname = "forecast";
+  version = "0-unstable-2025-03-09";
 
   src = fetchFromGitHub {
     owner = "cosmic-utils";
     repo = "forecast";
-    rev = "368849b9f7bff7afc667f414d1509465137a6251";
-    hash = "sha256-LR+0ZMB9ZThQGPVOHjV7Rw3PlAJ61Tt0qZUwDNY6OTU=";
+    rev = "393ea6ed4d6b1ba5bba71216bd25a869811ad14d";
+    hash = "sha256-r0S3AzbpK8l3wrXNT2F1v4GHJFom32YJ63qjhrtBgB0=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-qprOxLWpwrHLa3cMnzJqySGGtKIZlcIeZSQMvNcnSmA=";
+  cargoHash = "sha256-mqZ2tIZzQWU39SMj8UBnScsGAg4xGhkcm51aXx3UBSk=";
 
   nativeBuildInputs = [
     libcosmicAppHook
@@ -46,18 +46,16 @@ rustPlatform.buildRustPackage rec {
     "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/cosmic-ext-forecast"
   ];
 
-  env.VERGEN_GIT_SHA = src.rev;
-
   passthru.updateScript = nix-update-script { };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/cosmic-utils/forecast";
     description = "Weather forecast for the COSMIC Desktop Environment";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "cosmic-ext-forecast";
   };
 }

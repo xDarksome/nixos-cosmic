@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  modulesPath,
   ...
 }:
 
@@ -9,12 +10,17 @@ let
   cfg = config.services.displayManager.cosmic-greeter;
 in
 {
+  disabledModules = [
+    "${toString modulesPath}/services/display-managers/cosmic-greeter.nix"
+  ];
+
   meta.maintainers = with lib.maintainers; [
     # lilyinstarlight
   ];
 
   options.services.displayManager.cosmic-greeter = {
     enable = lib.mkEnableOption "COSMIC greeter";
+    package = lib.mkPackageOption pkgs "cosmic-greeter" { };
   };
 
   config = lib.mkIf cfg.enable {
@@ -24,7 +30,7 @@ in
       settings = {
         default_session = {
           user = "cosmic-greeter";
-          command = ''${lib.getExe' pkgs.coreutils "env"} XCURSOR_THEME="''${XCURSOR_THEME:-Pop}" systemd-cat -t cosmic-greeter ${lib.getExe pkgs.cosmic-comp} ${lib.getExe pkgs.cosmic-greeter}'';
+          command = ''${lib.getExe' pkgs.coreutils "env"} XCURSOR_THEME="''${XCURSOR_THEME:-Pop}" systemd-cat -t cosmic-greeter ${lib.getExe pkgs.cosmic-comp} ${lib.getExe cfg.package}'';
         };
       };
     };
@@ -36,7 +42,7 @@ in
       serviceConfig = {
         Type = "dbus";
         BusName = "com.system76.CosmicGreeter";
-        ExecStart = lib.getExe' pkgs.cosmic-greeter "cosmic-greeter-daemon";
+        ExecStart = lib.getExe' cfg.package "cosmic-greeter-daemon";
         Restart = "on-failure";
       };
     };
@@ -53,7 +59,7 @@ in
     users.groups.cosmic-greeter = { };
 
     # required features
-    hardware.${if lib.versionAtLeast lib.version "24.11" then "graphics" else "opengl"}.enable = true;
+    hardware.graphics.enable = true;
     services.libinput.enable = true;
 
     # required dbus services
@@ -63,6 +69,6 @@ in
     security.pam.services.cosmic-greeter = { };
 
     # dbus definitions
-    services.dbus.packages = with pkgs; [ cosmic-greeter ];
+    services.dbus.packages = [ cfg.package ];
   };
 }

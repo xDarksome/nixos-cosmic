@@ -4,6 +4,7 @@
   fetchFromGitHub,
   libcosmicAppHook,
   pkg-config,
+  libgbm ? null,
   libinput,
   mesa,
   udev,
@@ -12,25 +13,25 @@
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-workspaces-epoch";
-  version = "1.0.0-alpha.4-unstable-2024-12-17";
+  version = "1.0.0-alpha.6-unstable-2025-04-08";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-workspaces-epoch";
-    rev = "e0c0f27f6722e2a91084594c4c815f6af3de27c8";
-    hash = "sha256-5i+YBR+FqT5IH6tPiRZqNGWw+0j8hlWZ1JGRpMcARPc=";
+    rev = "076bb981a63da32f0f046b3a025243e4a479eff2";
+    hash = "sha256-yf4blZemyDp8SyijSzPbKD1w0rdFNGEev97dT9W1bkg=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-QRBgFTXPWQ0RCSfCA2WpBs+vKTFD7Xfz60cIDtbYb5Y=";
+  cargoHash = "sha256-yagg6b1Ry46asZXrhEKl6G9guoSsv0vuo6xIWlUBSFs=";
 
   nativeBuildInputs = [
     libcosmicAppHook
     pkg-config
   ];
   buildInputs = [
+    (if libgbm != null then libgbm else mesa)
     libinput
-    mesa
     udev
   ];
 
@@ -47,14 +48,14 @@ rustPlatform.buildRustPackage {
     ];
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/pop-os/cosmic-workspaces-epoch";
     description = "Workspaces Epoch for the COSMIC Desktop Environment";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "cosmic-workspaces";
   };
 }

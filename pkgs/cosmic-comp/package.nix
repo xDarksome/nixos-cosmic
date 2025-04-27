@@ -3,6 +3,8 @@
   fetchFromGitHub,
   rustPlatform,
   libcosmicAppHook,
+  libdisplay-info,
+  libgbm ? null,
   libinput,
   mesa,
   pixman,
@@ -19,17 +21,17 @@
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-comp";
-  version = "1.0.0-alpha.4-unstable-2024-12-18";
+  version = "1.0.0-alpha.7-unstable-2025-04-24";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-comp";
-    rev = "9e88ec5fee7e00cf3d8a13d707a5fbe4bd9a983f";
-    hash = "sha256-YjLB5IhlSSJuOD/AFYk7YID1nTK7GPr7Ud8fPVcH434=";
+    rev = "96e9bf3b81718e2a9ac28b2c24bd1149400b286a";
+    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-B5WwdkbowqzDGMN1pj0IPTUQrOG1lWNyCH5ATJVewv0=";
+  cargoHash = "sha256-8/LBIGQjrgofpQ27COpm0C0Pe4bOZNqNpGcV/IYQLLc=";
 
   separateDebugInfo = true;
 
@@ -38,8 +40,9 @@ rustPlatform.buildRustPackage {
     pkg-config
   ];
   buildInputs = [
+    libdisplay-info
+    (if libgbm != null then libgbm else mesa)
     libinput
-    mesa
     pixman
     seatd
     udev
@@ -66,14 +69,14 @@ rustPlatform.buildRustPackage {
     ];
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/pop-os/cosmic-comp";
     description = "Compositor for the COSMIC Desktop Environment";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "cosmic-comp";
   };
 }

@@ -10,17 +10,17 @@
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-applibrary";
-  version = "1.0.0-alpha.4-unstable-2024-11-15";
+  version = "1.0.0-alpha.6-unstable-2025-04-08";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-applibrary";
-    rev = "676656da1eca2110db22f11f5a26e1d70628fdbd";
-    hash = "sha256-FA2KMwU3KTFNomIGQBKnNNixfzTk8KWs+FhHBb0UR+o=";
+    rev = "d5dab8e030e5887b1277a9fec9ba79b228f087a4";
+    hash = "sha256-tWYB8/DH/wtnHWHtXccNY+U5ZN+1/TFmU9oTcdSFpqY=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-+TbKXdB2RFJi1OPIaczq0pSAq8Z7dXxchUu1xmA2GH8=";
+  cargoHash = "sha256-+nkXcbAPcIkg+p4ct/E0bm5O0n1MGN43AaWPjw13t9s=";
 
   nativeBuildInputs = [
     libcosmicAppHook
@@ -46,14 +46,14 @@ rustPlatform.buildRustPackage {
     ];
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/pop-os/cosmic-applibrary";
     description = "Application Template for the COSMIC Desktop Environment";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "cosmic-app-library";
   };
 }

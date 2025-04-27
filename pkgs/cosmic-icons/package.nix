@@ -10,13 +10,13 @@
 
 stdenvNoCC.mkDerivation {
   pname = "cosmic-icons";
-  version = "1.0.0-alpha.4-unstable-2024-10-02";
+  version = "1.0.0-alpha.6-unstable-2025-03-21";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-icons";
-    rev = "3fdc2175c145e00d798f98e81d5c4d493f0a2a8c";
-    hash = "sha256-7gWCRBiE+XJX1JSjopyPN4bIIgZih6ZKGVSA7wBq3i0=";
+    rev = "0b2aed444daa52c65effbb8e71a8a19b0f2e4cb9";
+    hash = "sha256-KDmEYeuiDTYvqg2XJK8pMDfsmROKtN+if5Qxz57H5xs=";
   };
 
   nativeBuildInputs = [ just ];
@@ -41,13 +41,13 @@ stdenvNoCC.mkDerivation {
     ];
   };
 
-  meta = with lib; {
+  meta = {
     description = "System76 COSMIC icon theme for Linux";
     homepage = "https://github.com/pop-os/cosmic-icons";
-    license = with licenses; [ cc-by-sa-40 ];
-    maintainers = with maintainers; [
+    license = lib.licenses.cc-by-sa-40;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.all;
+    platforms = lib.platforms.all;
   };
 }

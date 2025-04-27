@@ -3,6 +3,7 @@
   pkgs,
   lib,
   utils,
+  modulesPath,
   ...
 }:
 
@@ -10,6 +11,10 @@ let
   cfg = config.services.desktopManager.cosmic;
 in
 {
+  disabledModules = [
+    "${toString modulesPath}/services/desktop-managers/cosmic.nix"
+  ];
+
   meta.maintainers = with lib.maintainers; [
     # lilyinstarlight
   ];
@@ -48,17 +53,8 @@ in
     ];
     environment.systemPackages = utils.removePackagesByName (
       with pkgs;
-      (
-        if lib.versionAtLeast lib.version "24.11" then
-          [
-            adwaita-icon-theme
-          ]
-        else
-          [
-            gnome.adwaita-icon-theme
-          ]
-      )
-      ++ [
+      [
+        adwaita-icon-theme
         alsa-utils
         cosmic-applets
         cosmic-applibrary
@@ -69,13 +65,14 @@ in
         })
         cosmic-edit
         cosmic-files
-        cosmic-greeter
+        config.services.displayManager.cosmic-greeter.package
         cosmic-icons
         cosmic-idle
         cosmic-launcher
         cosmic-notifications
         cosmic-osd
         cosmic-panel
+        cosmic-player
         cosmic-randr
         cosmic-screenshot
         cosmic-session
@@ -101,21 +98,10 @@ in
     # xdg portal packages and config
     xdg.portal = {
       enable = true;
-      extraPortals =
-        with pkgs;
-        [
-          xdg-desktop-portal-cosmic
-        ]
-        # TODO: work around duplicate xdg-desktop-portal-gtk problems until NixOS 24.11 is released (see <https://github.com/lilyinstarlight/nixos-cosmic/issues/17>)
-        ++ lib.optionals (
-          lib.versionAtLeast lib.version "24.11"
-          || !(
-            config.services.xserver.desktopManager.gnome.enable
-            || config.services.xserver.desktopManager.deepin.enable
-            || config.services.xserver.desktopManager.cinnamon.enable
-            || config.services.xserver.desktopManager.phosh.enable
-          )
-        ) [ xdg-desktop-portal-gtk ];
+      extraPortals = with pkgs; [
+        xdg-desktop-portal-cosmic
+        xdg-desktop-portal-gtk
+      ];
       configPackages = lib.mkDefault (
         with pkgs;
         [
@@ -127,6 +113,8 @@ in
     # fonts
     fonts.packages = utils.removePackagesByName (with pkgs; [
       fira
+      noto-fonts
+      open-sans
     ]) config.environment.cosmic.excludePackages;
 
     # xkb config
@@ -134,7 +122,7 @@ in
     environment.sessionVariables.X11_EXTRA_RULES_XML = "${config.services.xserver.xkb.dir}/rules/base.extras.xml";
 
     # required features
-    hardware.${if lib.versionAtLeast lib.version "24.11" then "graphics" else "opengl"}.enable = true;
+    hardware.graphics.enable = true;
     services.libinput.enable = true;
     xdg.mime.enable = true;
     xdg.icons.enable = true;
@@ -142,6 +130,7 @@ in
     # optional features
     hardware.bluetooth.enable = lib.mkDefault true;
     services.acpid.enable = lib.mkDefault true;
+    services.avahi.enable = lib.mkDefault true;
     services.pipewire = {
       enable = lib.mkDefault true;
       alsa.enable = lib.mkDefault true;
@@ -162,6 +151,11 @@ in
     );
     security.polkit.enable = true;
     security.rtkit.enable = true;
+    services.geoclue2.enable = true;
+
+    # disable geoclue2 user demo agent in session
+    # TODO: rework if NixOS geoclue2 module ever allows manually including demo agent in whitelist without adding user service
+    systemd.user.services.geoclue-agent.conflicts = [ "cosmic-session.target" ];
 
     # session packages
     services.displayManager.sessionPackages = with pkgs; [ cosmic-session ];
@@ -172,9 +166,17 @@ in
       wants = [ "xdg-desktop-autostart.target" ];
       before = [ "xdg-desktop-autostart.target" ];
     };
+    # TODO: remove when <https://github.com/nix-community/home-manager/pull/6332> is available on all supported home-manager branches
+    systemd.user.targets.tray = {
+      description = "Cosmic Tray Target";
+      requires = [ "graphical-session-pre.target" ];
+    };
 
     # required for screen locker
     security.pam.services.cosmic-greeter = { };
+
+    # set default cursor theme
+    xdg.icons.fallbackCursorThemes = lib.mkDefault [ "Cosmic" ];
 
     # module diagnostics
     warnings =
@@ -213,7 +215,7 @@ in
           when instantiating `pkgs` and be aware that the `nixpkgs.config` and `nixpkgs.overlays` options will
           not function for any NixOS modules.
 
-          Note that the COSMIC packages in Nixpkgs are still largely broken as of 2024-10-16 and will not be
+          Note that the COSMIC packages in Nixpkgs are still largely broken as of 2025-02-08 and will not be
           usable for having a fully functional COSMIC desktop environment. The overlay is therefore necessary.
         '';
       }

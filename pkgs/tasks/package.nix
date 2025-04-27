@@ -11,19 +11,19 @@
   nix-update-script,
 }:
 
-rustPlatform.buildRustPackage rec {
-  pname = "cosmic-ext-tasks";
-  version = "0.1.1-unstable-2024-11-20";
+rustPlatform.buildRustPackage {
+  pname = "tasks";
+  version = "0.1.1-unstable-2025-03-10";
 
   src = fetchFromGitHub {
     owner = "cosmic-utils";
     repo = "tasks";
-    rev = "277536f5ea9c65351ea051f62c60347bee1fa75a";
-    hash = "sha256-GmSziMF2hiNRiApMBt4wPEomItEiQfJiIr9rR8c8YQg=";
+    rev = "837496c5044b29c05bd993855bf02cb9a0d2b2fa";
+    hash = "sha256-Wu0ddiToFJzD25DSveteQhFwC25CeIUT00jNt1JK/c8=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-b4dOhNBS6jIFWhLAEbhu0k3OCkwsw/cZRlgKZrp2pIg=";
+  cargoHash = "sha256-zW10eDBTGdir5Tj3pvfpjy6CYyK0G1fXSi6ucrU0D6k=";
 
   nativeBuildInputs = [
     libcosmicAppHook
@@ -48,18 +48,16 @@ rustPlatform.buildRustPackage rec {
     "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/tasks"
   ];
 
-  env.VERGEN_GIT_SHA = src.rev;
-
   passthru.updateScript = nix-update-script { };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/cosmic-utils/tasks";
     description = "Simple task management application for the COSMIC Desktop Environment";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "tasks";
   };
 }

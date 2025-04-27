@@ -10,17 +10,17 @@
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-launcher";
-  version = "1.0.0-alpha.4-unstable-2024-12-12";
+  version = "1.0.0-alpha.6-unstable-2025-04-08";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-launcher";
-    rev = "468e138440214bcd4ae5f5fdf374fc49bf14550c";
-    hash = "sha256-jaXJxcOJfzUUczdE3BkEx98sKr3yUQgCpulY7W9hjto=";
+    rev = "cc028b503493d025a61e3fd222ceedc10b72ba1a";
+    hash = "sha256-pKv31hCxN74Eer+1wZjh8R5ROVcfAS2sVzf6WzpCKgc=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-gWC3y4VndqmBXmbiHmddNquZN5Uyrj2jRYQ7QO+bAFo=";
+  cargoHash = "sha256-Wh3vI42RBfXpI7mvPVUmGK3fITGi+EGyo+lG7VnZg3w=";
 
   nativeBuildInputs = [
     libcosmicAppHook
@@ -48,14 +48,14 @@ rustPlatform.buildRustPackage {
     ];
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/pop-os/cosmic-launcher";
     description = "Launcher for the COSMIC Desktop Environment";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "cosmic-launcher";
   };
 }

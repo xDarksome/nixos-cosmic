@@ -10,19 +10,19 @@
   nix-update-script,
 }:
 
-rustPlatform.buildRustPackage {
+rustPlatform.buildRustPackage rec {
   pname = "quick-webapps";
-  version = "0.5.4-unstable-2024-12-24";
+  version = "1.0.2-unstable-2025-03-14";
 
   src = fetchFromGitHub {
     owner = "cosmic-utils";
     repo = "web-apps";
-    rev = "c7571ed5ace4429dd8cd80bc9983c1eb4b2fbf3b";
-    hash = "sha256-Rovd/X4xQ/nYUnX9cRZDT38k7Xjd13wNMBXkofPgwvo=";
+    rev = "054b631aa1426c8e90d3f77f037797c339715cde";
+    hash = "sha256-Vy0O2zptrpixnTRl+CuOijB3VIGHobfJEebASgxJDwk=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-eCMtv4/SjaAB7NkwnorwRiUbtejS98dryaXywlwBkJQ=";
+  cargoHash = "sha256-tk3e1lWfoeO6FSc9glw+u2/QlhfyLU0UlRQr2xDX/6g=";
 
   nativeBuildInputs = [
     libcosmicAppHook
@@ -46,16 +46,18 @@ rustPlatform.buildRustPackage {
     "target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/quick-webapps"
   ];
 
+  env.VERGEN_GIT_SHA = src.rev;
+
   passthru.updateScript = nix-update-script { };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/cosmic-utils/web-apps";
     description = "Web app manager for the COSMIC Desktop Environment";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "quick-webapps";
   };
 }

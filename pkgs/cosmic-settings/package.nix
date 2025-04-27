@@ -28,17 +28,17 @@ in
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-settings";
-  version = "1.0.0-alpha.4-unstable-2024-12-17";
+  version = "1.0.0-alpha.6-unstable-2025-04-08";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-settings";
-    rev = "89815018340ae5d70726ba98b393ef693269ac1c";
-    hash = "sha256-cdIEv058J0WgO+eghW0JLO/KK6FMWwQvfmyNkJIzWjw=";
+    rev = "a19a19d24cee5748c60558ce83d1e7c6efc11e63";
+    hash = "sha256-G9Ie6VeJdvby3s5+D+zjeI0trYYBoUdLp+GKFFXF5qE=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-NWAOHLeMRohMoDpSMCYfe8XXMhLz91tl94f3uQT1KaM=";
+  cargoHash = "sha256-7x1eAiH5czJnR3GTyyi4tOdySJy6QPXrV6pfcIZOa5k=";
 
   nativeBuildInputs = [
     libcosmicAppHook'
@@ -83,14 +83,14 @@ rustPlatform.buildRustPackage {
     ];
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/pop-os/cosmic-settings";
     description = "Settings for the COSMIC Desktop Environment";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "cosmic-settings";
   };
 }

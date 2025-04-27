@@ -32,7 +32,7 @@
       ];
       rustPlatformFor =
         pkgs:
-        if nixpkgs.lib.versionAtLeast pkgs.rustc.version "1.80.0" then
+        if nixpkgs.lib.versionAtLeast pkgs.rustc.version "1.85.0" then
           pkgs.rustPlatform
         else
           let
@@ -41,6 +41,15 @@
           pkgs.makeRustPlatform {
             cargo = rust-bin.stable.latest.default;
             rustc = rust-bin.stable.latest.default;
+            cargo-auditable =
+              if nixpkgs.lib.versionAtLeast pkgs.cargo-auditable.version "0.6.5" then
+                pkgs.cargo-auditable
+              else
+                pkgs.cargo-auditable.overrideAttrs (attrs: {
+                  meta = attrs.meta // {
+                    broken = true;
+                  };
+                });
           };
     in
     {
@@ -129,31 +138,35 @@
                       environment.systemPackages =
                         with pkgs;
                         [
+                          andromeda
                           chronos
+                          cosmic-ext-applet-caffeine
                           cosmic-ext-applet-clipboard-manager
                           cosmic-ext-applet-emoji-selector
                           cosmic-ext-applet-external-monitor-brightness
                           cosmic-ext-calculator
                           cosmic-ext-ctl
-                          cosmic-ext-examine
-                          cosmic-ext-forecast
-                          cosmic-ext-tasks
+                          examine
+                          forecast
+                          tasks
                           cosmic-ext-tweaks
                           (lib.lowPrio cosmic-comp)
-                          cosmic-player
                           cosmic-reader
                           drm_info
                           firefox
                           quick-webapps
                           stellarshot
                         ]
-                        ++ lib.optionals pkgs.stdenv.hostPlatform.isx86 [
-                          cosmic-ext-observatory
+                        ++ lib.optionals stdenv.hostPlatform.isx86 [
+                          observatory
                         ];
 
                       environment.sessionVariables = {
                         COSMIC_DATA_CONTROL_ENABLED = "1";
                       };
+
+                      systemd.packages = with pkgs; lib.optionals stdenv.hostPlatform.isx86 [ observatory ];
+                      systemd.services.monitord.wantedBy = [ "multi-user.target" ];
 
                       boot.kernelParams = [
                         "quiet"

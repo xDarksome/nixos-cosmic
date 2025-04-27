@@ -10,17 +10,17 @@
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-ext-calculator";
-  version = "0.1.1-unstable-2024-11-26";
+  version = "0.1.1-unstable-2025-03-10";
 
   src = fetchFromGitHub {
     owner = "cosmic-utils";
     repo = "calculator";
-    rev = "e3b60c1764417fbde8bc844e0a49df00f8934ff1";
-    hash = "sha256-6eFnjcrXbCG4kv8Ms2djbnMUzse/hVxwQVmrZa7u8VU=";
+    rev = "267687ea2fecebad42b10757ec0296118b80660b";
+    hash = "sha256-ZatiNMH8uK6pMXWer7T9IHRB8Gd5Cw0IXVWWCGvNLv0=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-5JBq6nIVv6Ao7wQ4Ta5YmTHXgrsscHu000qJ9M4tWyM=";
+  cargoHash = "sha256-HVe/Ry6dvG1VSKQyND5yqhB6YAS3+eRvwyXCsaQQXww=";
 
   nativeBuildInputs = [
     libcosmicAppHook
@@ -41,14 +41,14 @@ rustPlatform.buildRustPackage {
 
   passthru.updateScript = nix-update-script { };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/cosmic-utils/calculator";
     description = "Calculator for the COSMIC Desktop Environment";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "cosmic-ext-calculator";
   };
 }

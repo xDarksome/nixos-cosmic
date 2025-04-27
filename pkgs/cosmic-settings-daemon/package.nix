@@ -5,27 +5,29 @@
   geoclue2-with-demo-agent,
   libinput,
   pkg-config,
+  pulseaudio,
   udev,
   nix-update-script,
 }:
 
 rustPlatform.buildRustPackage {
   pname = "cosmic-settings-daemon";
-  version = "1.0.0-alpha.4-unstable-2024-12-24";
+  version = "1.0.0-alpha.6-unstable-2025-03-28";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-settings-daemon";
-    rev = "61c76a9d060827402eeb9fe92cae73ce159d66e5";
-    hash = "sha256-BCOVyJ1IIik/R4qC/16csJH8yII4WxdxO116hdvUl3I=";
+    rev = "4a64bba4f103a5d4cc5c8d60382f06ef662eca02";
+    hash = "sha256-Md9I5Y1+gCwLMZMsn2Y4tMHQSkewqIlD/HwrKtAXhn4=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-w/2BivWmKj5jh50OS4eR7Rf5kR3OT33jwIyEcsC1M8I=";
+  cargoHash = "sha256-Dzv1SDeZFIa+LFQQ91lO7RBHldsjDnGf+R12Ln2WZwU=";
 
   nativeBuildInputs = [ pkg-config ];
   buildInputs = [
     libinput
+    pulseaudio
     udev
   ];
 
@@ -44,14 +46,14 @@ rustPlatform.buildRustPackage {
     ];
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/pop-os/cosmic-settings-daemon";
     description = "Settings daemon for the COSMIC Desktop Environment";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
     mainProgram = "cosmic-settings-daemon";
   };
 }

@@ -1,28 +1,32 @@
 {
   lib,
+  stdenv,
   rustPlatform,
   fetchFromGitHub,
   libcosmicAppHook,
-  pkg-config,
+  coreutils,
+  util-linux,
+  libgbm ? null,
   mesa,
   pipewire,
+  pkg-config,
   gst_all_1,
   nix-update-script,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "xdg-desktop-portal-cosmic";
-  version = "1.0.0-alpha.4-unstable-2024-12-04";
+  version = "1.0.0-alpha.6-unstable-2025-04-08";
 
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "xdg-desktop-portal-cosmic";
-    rev = "e7c92a7316ad5c6e0ccfa08adaae118ee8f2738f";
-    hash = "sha256-4FdgavjxRKbU5/WBw9lcpWYLxCH6IJr7LaGkEXYUGbw=";
+    rev = "b655a8ef068390e20740d48f267e9e23b173c198";
+    hash = "sha256-7yfrjKHuYOWPMMkHdGZ+g0hynh2TtSf4h8zW13tTus4=";
   };
 
   useFetchCargoVendor = true;
-  cargoHash = "sha256-FgfUkU9sv5mq4+pou2myQn6+DkLzPacjUhQ4pL8hntM=";
+  cargoHash = "sha256-fOaLeWtrjgBDSShC5OmBZKODNQn4bp/+iPZX5ZMQFqk=";
 
   separateDebugInfo = true;
 
@@ -30,21 +34,31 @@ rustPlatform.buildRustPackage rec {
     libcosmicAppHook
     rustPlatform.bindgenHook
     pkg-config
+    util-linux
   ];
   buildInputs = [
-    mesa
+    (if libgbm != null then libgbm else mesa)
     pipewire
   ];
   checkInputs = [ gst_all_1.gstreamer ];
 
   env.VERGEN_GIT_SHA = src.rev;
 
+  # TODO: remove when dbus activation for xdg-desktop-portal-cosmic is fixed to properly start it
+  postPatch = ''
+    substituteInPlace data/org.freedesktop.impl.portal.desktop.cosmic.service \
+      --replace-fail 'Exec=/bin/false' 'Exec=${lib.getExe' coreutils "true"}'
+  '';
+
+  dontCargoInstall = true;
+
+  makeFlags = [
+    "CARGO_TARGET_DIR=target/${stdenv.hostPlatform.rust.cargoShortTarget}"
+    "prefix=${placeholder "out"}"
+  ];
+
   postInstall = ''
-    mkdir -p $out/share/{dbus-1/services,icons,xdg-desktop-portal/portals}
-    cp -r data/icons $out/share/icons/hicolor
-    cp data/*.service $out/share/dbus-1/services/
-    cp data/cosmic.portal $out/share/xdg-desktop-portal/portals/
-    cp data/cosmic-portals.conf $out/share/xdg-desktop-portal/
+    mv $out/libexec $out/bin
   '';
 
   passthru.updateScript = nix-update-script {
@@ -54,14 +68,14 @@ rustPlatform.buildRustPackage rec {
     ];
   };
 
-  meta = with lib; {
+  meta = {
     homepage = "https://github.com/pop-os/xdg-desktop-portal-cosmic";
     description = "XDG Desktop Portal for the COSMIC Desktop Environment";
-    license = licenses.gpl3Only;
-    maintainers = with maintainers; [
+    license = lib.licenses.gpl3Only;
+    maintainers = with lib.maintainers; [
       # lilyinstarlight
     ];
     mainProgram = "xdg-desktop-portal-cosmic";
-    platforms = platforms.linux;
+    platforms = lib.platforms.linux;
   };
 }
